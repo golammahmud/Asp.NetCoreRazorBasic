@@ -1,0 +1,28 @@
+﻿@page "{id:min(1)?}/{handler?}"
+@model GenerikRepositoryPattern.Pages.EShop.Categories.AddModel
+@{
+    ViewData["title"] = " Add New Product";
+    var pageHeader = Model.Category.Id > 0 ? "Edit" : "Create";
+    var pageButton = Model.Category.Id > 0 ? "Update" : "Create";
+}
+
+<div class="container">
+    <h1>@pageHeader</h1>
+    <form method="post">
+        <input class="form-control" type="hidden" asp-for="Category.Id" />
+        <div class="form-group ">
+            <label class="form-label" asp-for="Category.Name"></label>
+            <input class="form-control" type="text" asp-for="Category.Name" />
+            <span asp-validation-for="Category.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group ">
+            <label class="form-label" asp-for="Category.CreatedAt"></label>
+            <input class="form-control" type="hidden" value="@System.DateTime.UtcNow" asp-for="Category.CreatedAt" />
+            <span asp-validation-for="Category.CreatedAt" class="text-danger"></span>
+        </div>
+       
+        <div class="form-control">
+            <button type="submit" class="btn-outline-info btn-lg">@pageButton</button>
+        </div>
+    </form>
+</div>
