@@ -32,7 +32,7 @@
            <div class="col-md-4">
                 <label class="form-label" asp-for="product.CategoryId"></label>
                 <select class="form-select  mb-3" asp-for="product.CategoryId" asp-items="@Model.Options" aria-label=".form-select-lg example">
-                    <option selected>Open this select menu</option>
+                    <option value="">--Select Category--</option>
                 </select>
                 <span asp-validation-for="product.CreatedAt" class="text-danger"></span>
            </div>

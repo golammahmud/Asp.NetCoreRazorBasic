@@ -22,7 +22,9 @@ namespace GenerikRepositoryPattern.Models
 
         public IFormFile? FormFile { get; set; }
 
-        [DataType(DataType.DateTime)]
+
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? CreatedAt { get; set; }
     }
 }

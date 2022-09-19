@@ -2,13 +2,14 @@
 @model GenerikRepositoryPattern.Pages.EShop.Products.IndexModel
 @{
 }
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    @if (Model.ViewData["message"] != null)
-    {
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
         @Model.ViewData["message"]
-    }
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <div class="top-buffer"></div>
 <div class="panel panel-primary">
     <div class="panel-heading panel-head">Product List</div>
@@ -57,13 +58,16 @@
                         <td><img src="~/FileUploads/@item.FileUrl" class="rounded-circle" width="50" height="50" /></td>
                         <td>@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.Price)</td>
-                        <td>@Html.DisplayFor(modelItem => item.CategoryId)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                        <td>@if(item.File !=null){
-                                <a href="@Url.Page("Index", "DownloadFileFromFolder", new { FileName = item.FileUrl })" class="btn btn-warning">DownloadFolder</a>
-                            }</td>
                         <td>
-                            @if ( item.FileUrl != null)
+                            @if (item.File != null)
+                            {
+                                <a href="@Url.Page("Index", "DownloadFileFromFolder", new { FileName = item.FileUrl })" class="btn btn-warning">DownloadFolder</a>
+                            }
+                        </td>
+                        <td>
+                            @if (item.FileUrl != null)
                             {
                                 <a href="@Url.Page("Index", "DownloadFileFromDatabase", new { FileName = item.FileUrl })" class="btn btn-secondary">DownloadDatabase</a>
                             }

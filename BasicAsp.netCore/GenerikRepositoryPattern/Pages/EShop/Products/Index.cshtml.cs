@@ -14,9 +14,9 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
     {
         private AppDbContext _context;
         private IGenerik<Product> _IProducts;
-        
+
         private readonly IWebHostEnvironment _hostenvironment;
-       
+
         public IndexModel(IGenerik<Product> iProducts, IWebHostEnvironment webHostEnvironment, AppDbContext context)
         {
             this._IProducts = iProducts;
@@ -30,14 +30,13 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
         public void OnGet()
         {
             products = new List<Product>();
-            products = _IProducts.GetAll().ToList();
-           
+            products =_context.Produt.Include(item => item.Category).ToList(); ; /*AsNoTracking improves performance because the entities returned are not tracked. The entities don't need to be tracked because they're not updated in the current context.*/
             if (products.Count > 0)
             {
                 products = products.OrderBy(x => x.Name).ToList();
 
             }
-           
+
         }
         public FileResult OnGetDownloadFileFromFolder(string fileName)
         {

@@ -73,6 +73,11 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
 
                 if (product.Id > 0)
                 {
+                    if (product.Category == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "category is required");
+                        return Page();
+                    }
                     Product domainProduct = new Product();
                     {
                         domainProduct.Id = product.Id;
@@ -82,9 +87,6 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         domainProduct.Description = product.Description;
                         domainProduct.CreatedAt = (DateTime)product.CreatedAt;
                     }
-
-
-
                     _IProducts.Update(domainProduct);
                     _IProducts.Save();
 
@@ -115,6 +117,8 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         }
 
                         //uploads file to database
+                                //SaveDocument(product.FormFile);
+                        //or
                         using (var memoryStream = new MemoryStream())
                         {
                             await product.FormFile.CopyToAsync(memoryStream);
@@ -134,12 +138,61 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                     }
                     _IProducts.Insert(domainProduct);
                     _IProducts.Save();
-                    ViewData["message"] = "record update succefully";
+                    TempData["Message"] = "Client  has Been Added Successfully";
                 }
                 return RedirectToPage("Index");
             }
 
             return Page();
+        }
+        private void SaveDocument(IFormFile document)
+        {
+            if (IsFileValid(document))
+            {
+                product.File = GetFileBytes(document);
+                product.FileUrl = document.FileName;
+                //CollectionData.FileType = document.ContentType;
+            }
+            else
+            {
+                ModelState.AddModelError("Collection Document", "No Document Uploaded");
+            }
+        }
+
+
+        private bool IsFileValid(IFormFile document)
+        {
+            if (document == null || document.Length < 0)
+            {
+                return false;
+            }
+
+            string fileName = document.FileName.ToLower();
+            if (fileName.LastIndexOf(".jpeg") <= 0 &&
+                fileName.LastIndexOf(".jpg") <= 0 &&
+                fileName.LastIndexOf(".png") <= 0 &&
+                fileName.LastIndexOf(".bmp") <= 0 &&
+                fileName.LastIndexOf(".pdf") <= 0 &&
+                fileName.LastIndexOf(".docx") <= 0 &&
+                fileName.LastIndexOf(".doc") <= 0 &&
+                fileName.LastIndexOf(".xlsx") <= 0 &&
+                fileName.LastIndexOf(".txt") <= 0 &&
+                fileName.LastIndexOf(".pptx") <= 0 &&
+                fileName.LastIndexOf(".ppt") <= 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private byte[] GetFileBytes(IFormFile file)
+        {
+            using (var memStream = new MemoryStream())
+            {
+                file.OpenReadStream().CopyTo(memStream);
+                return memStream.ToArray();
+            }
         }
     }
 }
