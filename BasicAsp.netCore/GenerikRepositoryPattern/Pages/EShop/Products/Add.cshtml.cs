@@ -43,6 +43,8 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                     product.Price = domainProduct.Price;
                     product.CategoryId = domainProduct.CategoryId;
                     product.Description = domainProduct.Description;
+                    product.File = domainProduct.File;
+                    product.FileUrl = domainProduct.FileUrl;
                     product.CreatedAt = domainProduct.CreatedAt;
 
                 }
@@ -78,29 +80,14 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         ModelState.AddModelError(string.Empty, "category is required");
                         return Page();
                     }
-                    Product domainProduct = new Product();
+                    Product updateProduct = new Product();
                     {
-                        domainProduct.Id = product.Id;
-                        domainProduct.Name = product.Name;
-                        domainProduct.Price = product.Price;
-                        domainProduct.CategoryId = product.CategoryId;
-                        domainProduct.Description = product.Description;
-                        domainProduct.CreatedAt = (DateTime)product.CreatedAt;
-                    }
-                    _IProducts.Update(domainProduct);
-                    _IProducts.Save();
-
-                }
-                else
-                {
-                    Product domainProduct = new Product();
-                    {
-                        domainProduct.Id = product.Id;
-                        domainProduct.Name = product.Name;
-                        domainProduct.Price = product.Price;
-                        domainProduct.CategoryId = product.CategoryId;
-                        domainProduct.Description = product.Description;
-                        domainProduct.CreatedAt = (DateTime)product.CreatedAt;
+                        updateProduct.Id = product.Id;
+                        updateProduct.Name = product.Name;
+                        updateProduct.Price = product.Price;
+                        updateProduct.CategoryId = product.CategoryId;
+                        updateProduct.Description = product.Description;
+                        updateProduct.CreatedAt = (DateTime)product.CreatedAt;
                     }
                     //uploads file to folder
                     if (product.FormFile.Length > 0)
@@ -113,20 +100,19 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             await product.FormFile.CopyToAsync(stream);
-                            domainProduct.FileUrl = uniqueFileName;
+                            updateProduct.FileUrl = uniqueFileName;
                         }
 
                         //uploads file to database
-                                //SaveDocument(product.FormFile);
+                        //SaveDocument(product.FormFile);
                         //or
                         using (var memoryStream = new MemoryStream())
                         {
                             await product.FormFile.CopyToAsync(memoryStream);
                             if (memoryStream.Length < 2097152)
                             {
-                                
-                                await product.FormFile.CopyToAsync(memoryStream);
-                                domainProduct.File = memoryStream.ToArray();
+                                //await product.FormFile.CopyToAsync(memoryStream);
+                                updateProduct.File = memoryStream.ToArray();
 
                             }
                             else
@@ -136,7 +122,66 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                             }
                         }
                     }
-                    _IProducts.Insert(domainProduct);
+                    _IProducts.Update(updateProduct);
+                    _IProducts.Save();
+
+                }
+                else
+                {
+                    Product newProduct = new Product();
+                    {
+                        newProduct.Id = product.Id;
+                        newProduct.Name = product.Name;
+                        newProduct.Price = product.Price;
+                        newProduct.CategoryId = product.CategoryId;
+                        newProduct.Description = product.Description;
+                        newProduct.CreatedAt = (DateTime)product.CreatedAt;
+                    }
+                    //uploads file to folder
+                    if (product.FormFile.Length > 0)
+                    {
+                        if (product.File.Length > 0 || product.File != null)
+                        {
+                            if (IsFileValid(product.FormFile))
+                            {
+                                string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
+                                string uniqueFileName = Guid.NewGuid().ToString() + "-" + product.FormFile.FileName;
+
+                              string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                               
+                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await product.FormFile.CopyToAsync(stream);
+                                    newProduct.FileUrl = uniqueFileName;
+                                }
+                                //uploads file to database
+                                //SaveDocument(product.FormFile);
+                                //or
+                                using (var memoryStream = new MemoryStream())
+                                {
+                                    await product.FormFile.CopyToAsync(memoryStream);
+                                    if (memoryStream.Length < 2097152)
+                                    {
+                                        newProduct.FileUrl = product.FileUrl;
+                                        newProduct.File = memoryStream.ToArray();
+                                    }
+                                    else
+                                    {
+                                        ModelState.AddModelError("File", "The file is too large");
+
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //product.File = GetFileBytes(document);
+                                //product.FileUrl = document.FileName;
+                                //CollectionData.FileType = document.ContentType;
+                                ModelState.AddModelError("Collection Document", "No Document Uploaded");
+                            }
+                        }
+                    }
+                    _IProducts.Insert(newProduct);
                     _IProducts.Save();
                     TempData["Message"] = "Client  has Been Added Successfully";
                 }

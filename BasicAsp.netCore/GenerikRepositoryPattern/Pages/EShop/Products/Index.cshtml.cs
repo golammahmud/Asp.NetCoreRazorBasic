@@ -30,7 +30,8 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
         public void OnGet()
         {
             products = new List<Product>();
-            products =_context.Produt.Include(item => item.Category).ToList(); ; /*AsNoTracking improves performance because the entities returned are not tracked. The entities don't need to be tracked because they're not updated in the current context.*/
+            //products = _IProducts.GetAll().ToList();
+            products = _context.Products.Include(c=>c.Category).ToList();/*_context.Product.Include(s => s.Category).ToList();*/  /*AsNoTracking improves performance because the entities returned are not tracked. The entities don't need to be tracked because they're not updated in the current context.*/
             if (products.Count > 0)
             {
                 products = products.OrderBy(x => x.Name).ToList();
@@ -52,7 +53,7 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
         }
         public FileResult OnGetDownloadFileFromDatabase(string fileName)
         {
-            var bytes = _context.Produt.Where(c => c.FileUrl == fileName).FirstOrDefault().File;
+            var bytes = _context.Products.Where(c => c.FileUrl == fileName).FirstOrDefault().File;
 
             //Send the File to Download.
             return File(bytes, "application/octet-stream", fileName);

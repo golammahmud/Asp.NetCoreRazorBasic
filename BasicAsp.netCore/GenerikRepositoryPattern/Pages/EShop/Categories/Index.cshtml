@@ -2,3 +2,82 @@
 @model GenerikRepositoryPattern.Pages.EShop.Categories.IndexModel
 @{
 }
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @Model.ViewData["message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="top-buffer"></div>
+<div class="panel panel-primary">
+    <div class="panel-heading panel-head">Product List</div>
+    <div class="panel-body">
+        <div class="btn-group">
+            <a id="createEditStudentModal" asp-page="Add" class="btn btn-primary">
+                <i class="glyphicon glyphicon-plus"></i>  Add Category
+            </a>
+        </div>
+        <div class="top-buffer"></div>
+        <table class="table table-bordered table-striped table-condensed">
+            <thead>
+                <tr>
+                    <th>databaseImage</th>
+                    <th>FolderImage</th>
+                    <th>Name</th>
+                    <th>Products</th>
+                    <th>Created </th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.categories)
+                {
+                    <tr>
+                        @*<td><img src="data:image/jpeg;base64,@Convert.ToBase64String(item.File)" /></td>*@
+                        @if (item.FileData != null)
+                        {
+                            <td>
+                                @{
+
+                                    var base64 = Convert.ToBase64String(item.FileData);
+                                    var FileSrc = string.Format("data:image/gif;base64,{0}", base64);
+                                }
+                                <img src="@FileSrc" class="rounded-circle" width="50" height="50" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+
+                                <img src="" class="rounded-circle" alt="@item.FileName" width="50" height="50" />
+                            </td>
+                        }
+                        <td><img src="~/FileUploads/@item.FileName" class="rounded-circle" width="50" height="50" /></td>
+                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td>
+                            <select class="form-select mb-3"  asp-items="@item.Products.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString()})" aria-label=".form-select-lg example">
+                               
+                            </select>
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                        <td>
+                            <a id="editStudentModal" data-toggle="modal" asp-page="Add" asp-route-id="@item.Id" data-target="#modal-action-student"
+                           class="btn btn-info">
+                                <i class="glyphicon glyphicon-pencil"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section scripts
+    {
+    <script src="~/js/student-index.js" asp-append-version="true"></script>
+}  

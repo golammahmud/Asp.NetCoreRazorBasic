@@ -8,19 +8,43 @@
 
 <div class="container">
     <h1>@pageHeader</h1>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <input class="form-control" type="hidden" asp-for="Category.Id" />
         <div class="form-group ">
             <label class="form-label" asp-for="Category.Name"></label>
             <input class="form-control" type="text" asp-for="Category.Name" />
             <span asp-validation-for="Category.Name" class="text-danger"></span>
         </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Category.FormFile" class="form-label"></label>
+                    <input asp-for="Category.FormFile" class="form-control" type="file" multiple />
+                    <span class="text-danger" asp-validation-for="Category.FormFile"></span>
+                </div>
+            </div>
+            @if (@Model.Category.FileData != null || @Model.Category.FileName != null)
+            {
+                <div class="col-md-6">
+
+                    @{
+                        var base64 = Convert.ToBase64String(@Model.Category.FileData);
+                        var FileSrc = string.Format("data:image/gif;base64,{0}", base64);
+                    }
+                    <label class="form-label text-wrap text-truncate">@Model.Category.FileName</label>
+                    <img src="@FileSrc" class="rounded" width="120" height="120" alt="@Html.DisplayFor(x=>x.Category.FileName)" />
+
+                </div>
+            }
+        </div>
+
         <div class="form-group ">
             <label class="form-label" asp-for="Category.CreatedAt"></label>
             <input class="form-control" type="hidden" value="@System.DateTime.UtcNow" asp-for="Category.CreatedAt" />
             <span asp-validation-for="Category.CreatedAt" class="text-danger"></span>
         </div>
-       
+
         <div class="form-control">
             <button type="submit" class="btn-outline-info btn-lg">@pageButton</button>
         </div>

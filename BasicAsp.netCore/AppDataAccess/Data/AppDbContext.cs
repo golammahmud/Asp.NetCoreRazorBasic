@@ -13,7 +13,7 @@ namespace AppDataAccess.Data
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
         }
-        public virtual DbSet<Product> Produt { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<Category> Category { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

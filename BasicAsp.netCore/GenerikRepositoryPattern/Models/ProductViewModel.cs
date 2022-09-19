@@ -11,7 +11,7 @@ namespace GenerikRepositoryPattern.Models
         public decimal? Price { get; set; }
 
         [Display(Name = "Category")]
-        public string? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public CategoryViewModel? Category { get; set; }
         public string? Description { get; set; }
 
