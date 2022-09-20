@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
+using System.IO.Pipes;
 using static System.Net.WebRequestMethods;
 
 namespace GenerikRepositoryPattern.Pages.EShop.Products
@@ -75,12 +76,13 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
 
                 if (product.Id > 0)
                 {
-                    if (product.Category == null)
+                    if (product.CategoryId == null)
                     {
                         ModelState.AddModelError(string.Empty, "category is required");
                         return Page();
                     }
-                    Product updateProduct = new Product();
+
+                    var updateProduct = _IProducts.GetById(product.Id);
                     {
                         updateProduct.Id = product.Id;
                         updateProduct.Name = product.Name;
@@ -90,35 +92,35 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         updateProduct.CreatedAt = (DateTime)product.CreatedAt;
                     }
                     //uploads file to folder
-                    if (product.FormFile.Length > 0)
+                    if ( product.FormFile != null || product.File == null )
                     {
-                        string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
 
-                        string uniqueFileName = Guid.NewGuid().ToString() + "-" + product.FormFile.FileName;
-
-                        string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        if (IsFileValid(product.FormFile))
                         {
-                            await product.FormFile.CopyToAsync(stream);
-                            updateProduct.FileUrl = uniqueFileName;
-                        }
-
-                        //uploads file to database
-                        //SaveDocument(product.FormFile);
-                        //or
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            await product.FormFile.CopyToAsync(memoryStream);
-                            if (memoryStream.Length < 2097152)
+                            if (updateProduct.FileUrl != null)
                             {
-                                //await product.FormFile.CopyToAsync(memoryStream);
-                                updateProduct.File = memoryStream.ToArray();
-
+                                string uploadedFile = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads", updateProduct.FileUrl);
+                                System.IO.File.Delete(uploadedFile);
                             }
-                            else
-                            {
-                                ModelState.AddModelError("File", "The file is too large");
+                            updateProduct.FileUrl = ProcessUploadedFile(product.FormFile);
 
+                            //uploads file to database
+                            //SaveDocument(product.FormFile);
+                            //or
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                await product.FormFile.CopyToAsync(memoryStream);
+                                if (memoryStream.Length < 2097152)
+                                {
+                                    updateProduct.File = memoryStream.ToArray();
+                                    //updateProduct.FileUrl = product.FormFile.FileName;
+
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("File", "The file is too large");
+
+                                }
                             }
                         }
                     }
@@ -140,46 +142,37 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                     //uploads file to folder
                     if (product.FormFile.Length > 0)
                     {
-                        if (product.File.Length > 0 || product.File != null)
+
+                        if (IsFileValid(product.FormFile))
                         {
-                            if (IsFileValid(product.FormFile))
+                           
+                            newProduct.FileUrl = ProcessUploadedFile(product.FormFile);
+                            //uploads file to database
+                            //SaveDocument(product.FormFile);
+                            //or
+                            using (var memoryStream = new MemoryStream())
                             {
-                                string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
-                                string uniqueFileName = Guid.NewGuid().ToString() + "-" + product.FormFile.FileName;
-
-                              string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                               
-                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                await product.FormFile.CopyToAsync(memoryStream);
+                                if (memoryStream.Length < 2097152)
                                 {
-                                    await product.FormFile.CopyToAsync(stream);
-                                    newProduct.FileUrl = uniqueFileName;
+                                    //newProduct.FileUrl = product.FormFile.FileName;
+                                    newProduct.File = memoryStream.ToArray();
                                 }
-                                //uploads file to database
-                                //SaveDocument(product.FormFile);
-                                //or
-                                using (var memoryStream = new MemoryStream())
+                                else
                                 {
-                                    await product.FormFile.CopyToAsync(memoryStream);
-                                    if (memoryStream.Length < 2097152)
-                                    {
-                                        newProduct.FileUrl = product.FileUrl;
-                                        newProduct.File = memoryStream.ToArray();
-                                    }
-                                    else
-                                    {
-                                        ModelState.AddModelError("File", "The file is too large");
+                                    ModelState.AddModelError("File", "The file is too large");
 
-                                    }
                                 }
-                            }
-                            else
-                            {
-                                //product.File = GetFileBytes(document);
-                                //product.FileUrl = document.FileName;
-                                //CollectionData.FileType = document.ContentType;
-                                ModelState.AddModelError("Collection Document", "No Document Uploaded");
                             }
                         }
+                        else
+                        {
+                            //product.File = GetFileBytes(document);
+                            //product.FileUrl = document.FileName;
+                            //CollectionData.FileType = document.ContentType;
+                            ModelState.AddModelError("Collection Document", "No Document Uploaded");
+                        }
+
                     }
                     _IProducts.Insert(newProduct);
                     _IProducts.Save();
@@ -238,6 +231,28 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                 file.OpenReadStream().CopyTo(memStream);
                 return memStream.ToArray();
             }
+        }
+        private string ProcessUploadedFile(IFormFile file)
+        {
+            string uniqueFileName = "";
+            string path = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            if (file != null)
+            {
+                string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
+                uniqueFileName = Guid.NewGuid().ToString() + "-" + file.FileName;
+                string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+            }
+
+            return uniqueFileName;
         }
     }
 }

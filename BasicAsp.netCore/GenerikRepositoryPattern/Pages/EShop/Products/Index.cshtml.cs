@@ -42,10 +42,11 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
         public FileResult OnGetDownloadFileFromFolder(string fileName)
         {
             //Build the File Path.
-            string path = Path.Combine(this._hostenvironment.WebRootPath, "FileUploads/") + fileName;
-
+            //string path = Path.Combine(this._hostenvironment.WebRootPath, "FileUploads") + fileName;
+            string filePath = Path.Combine(_hostenvironment.WebRootPath, "FileUploads", fileName);
+              
             //Read the File data into Byte Array.
-            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            byte[] bytes = System.IO.File.ReadAllBytes(filePath);
 
             //Send the File to Download.
             return File(bytes, "application/octet-stream", fileName);

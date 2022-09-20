@@ -61,13 +61,13 @@
                         <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.Description)</td>
                         <td>
-                            @if (item.File != null)
+                            @if (item.FileUrl != null)
                             {
                                 <a href="@Url.Page("Index", "DownloadFileFromFolder", new { FileName = item.FileUrl })" class="btn btn-warning">DownloadFolder</a>
                             }
                         </td>
                         <td>
-                            @if (item.FileUrl != null)
+                            @if (item.File != null)
                             {
                                 <a href="@Url.Page("Index", "DownloadFileFromDatabase", new { FileName = item.FileUrl })" class="btn btn-secondary">DownloadDatabase</a>
                             }

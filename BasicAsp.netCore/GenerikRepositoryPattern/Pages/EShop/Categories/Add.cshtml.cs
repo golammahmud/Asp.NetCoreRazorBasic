@@ -1,6 +1,7 @@
 using AppDataAccess.GenerikInterface;
 using AppDomain.DataModels;
 using GenerikRepositoryPattern.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -17,7 +18,6 @@ namespace GenerikRepositoryPattern.Pages.EShop.Categories
             this._Category = category;
             this.webHostEnvironment = webHostEnvironment;
         }
-
         [BindProperty]
         public CategoryViewModel Category { get; set; }
         public void OnGet(int? id)
@@ -25,20 +25,18 @@ namespace GenerikRepositoryPattern.Pages.EShop.Categories
             Category = new CategoryViewModel();
             if (id.HasValue)
             {
-               
+
                 var DomainCategory = _Category.GetById(id.Value);
                 {
+                    Category.Id = DomainCategory.Id;
                     Category.Name = DomainCategory.Name;
                     //Category.Products = DomainCategory.Products.ToList();
                     Category.FileName = DomainCategory.FileName;
-                    Category.FileData= DomainCategory.FileData;
+                    Category.FileData = DomainCategory.FileData;
                     Category.CreatedAt = DomainCategory.CreatedAt;
 
                 }
-
             }
-           
-
         }
         public IActionResult OnPost()
         {
@@ -48,55 +46,41 @@ namespace GenerikRepositoryPattern.Pages.EShop.Categories
             }
             if (Category.Id > 0)
             {
-                Category UpdateCategory = new Category();
+                var UpdateCategory = _Category.GetById(Category.Id); 
                 {
                     UpdateCategory.Name = Category.Name;
                     UpdateCategory.CreatedAt = Category.CreatedAt;
                 };
                 //uploads file to folder
-                if (Category.FormFile.Length > 0)
+                if (Category.FileData == null || Category.FormFile != null)
                 {
-                    if (Category.FormFile.Length > 2097152)
-                    {
-                        string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads/Category");
-                        string uniqueFileName = Guid.NewGuid().ToString() + "-" + Category.FormFile.FileName;
-                        string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            Category.FormFile.CopyToAsync(stream);
-                            UpdateCategory.FileName = uniqueFileName;
-                        }
-                    }
-                    //uploads file to database
+                   
                     if (IsFileValid(Category.FormFile))
                     {
+                        if (UpdateCategory.FileName != null)
+                        {
+                            string uploadedFile = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads/Category", UpdateCategory.FileName);
+                            System.IO.File.Delete(uploadedFile);
+                        }
+                      
+                        if (Category.FormFile.Length > 2097152)
+                        {
+                            UpdateCategory.FileName = ProcessUploadedFile(Category.FormFile);
+                        }
                         UpdateCategory.FileData = GetFileBytes(Category.FormFile);
-                        UpdateCategory.FileName = Category.FormFile.FileName;
-                        //CollectionData.FileType = document.ContentType;
+                        //UpdateCategory.FileName = Category.FormFile.FileName;
                     }
                     else
                     {
+                       
                         ModelState.AddModelError("Collection Document", "No Document Uploaded");
-                    }
-                    //or
-                    //using (var memoryStream = new MemoryStream())
-                    //{
-                    //    await Category.FormFile.CopyToAsync(memoryStream);
-                    //    if (memoryStream.Length < 2097152)
-                    //    {
-                    //        //await product.FormFile.CopyToAsync(memoryStream);
-                    //        NewAddCategory.FileData = memoryStream.ToArray();
-
-                    //    }
-                    //    else
-                    //    {
-                    //        ModelState.AddModelError("File", "The file is too large");
-
-                    //    }
-                    //}
+                    }  
                 }
+               
                 _Category.Update(UpdateCategory);
                 _Category.Save();
+                return RedirectToPage("Index");
+
             }
             else
             {
@@ -110,20 +94,23 @@ namespace GenerikRepositoryPattern.Pages.EShop.Categories
                 //uploads file to folder
                 if (Category.FormFile.Length > 0)
                 {
-                    if (Category.FormFile.Length > 2097152)
-                    {
-                        string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads/Category");
-                        string uniqueFileName = Guid.NewGuid().ToString() + "-" + Category.FormFile.FileName;
-                        string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            Category.FormFile.CopyToAsync(stream);
-                            NewAddCategory.FileName = uniqueFileName;
-                        }
-                    }
-                    //uploads file to database
                     if (IsFileValid(Category.FormFile))
                     {
+                        if (Category.FormFile.Length > 2097152)
+                        {
+                            //string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads/Category");
+                            //string uniqueFileName = Guid.NewGuid().ToString() + "-" + Category.FormFile.FileName;
+                            //string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                            //using (var stream = new FileStream(filePath, FileMode.Create))
+                            //{
+                            //    Category.FormFile.CopyToAsync(stream);
+                            //    NewAddCategory.FileName = uniqueFileName;
+                            //}
+                            NewAddCategory.FileName = ProcessUploadedFile(Category.FormFile);
+                        }
+                        //uploads file to database
+                        //if (IsFileValid(Category.FormFile))
+                        //{
                         NewAddCategory.FileData = GetFileBytes(Category.FormFile);
                         NewAddCategory.FileName = Category.FormFile.FileName;
                         //CollectionData.FileType = document.ContentType;
@@ -203,6 +190,28 @@ namespace GenerikRepositoryPattern.Pages.EShop.Categories
                 file.OpenReadStream().CopyTo(memStream);
                 return memStream.ToArray();
             }
+        }
+        private string ProcessUploadedFile(IFormFile file)
+        {
+            string uniqueFileName = "";
+            string path = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            if (file != null)
+            {
+                string uploadFolder = Path.Combine(webHostEnvironment.WebRootPath, "FileUploads/Category");
+                uniqueFileName = Guid.NewGuid().ToString() + "-" + file.FileName;
+                string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+            }
+
+            return uniqueFileName;
         }
     }
 }
