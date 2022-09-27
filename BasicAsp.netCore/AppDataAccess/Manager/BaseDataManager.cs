@@ -1,14 +1,17 @@
-﻿using System.Linq.Expressions;
+﻿using AppDataAccess.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace BeratenKatuwahDataAccess
 {
     public abstract class BaseDataManager
     {
-        protected KatuwahModel dbModel;
-
-        public BaseDataManager(KatuwahModel model)
+        private AppDbContext dbModel;
+       
+        public BaseDataManager(AppDbContext model)
         {
-            dbModel = model;
+            this.dbModel = model;
         }
 
         #region APIs
