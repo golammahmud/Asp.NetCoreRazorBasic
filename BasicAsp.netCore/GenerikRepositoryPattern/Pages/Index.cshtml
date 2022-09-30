@@ -3,8 +3,61 @@
 @{
     ViewData["Title"] = "Home page";
 }
+@using GenerikRepositoryPattern.Models
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@if (TempData["message"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container">
+    <div class="text-center">
+        <h1 class="display-4">Multiple check box</h1>
+    </div>
+    <div class="container">
+        <form method="post">
+            <input type="hidden" asp-for="AreChecked.Id" />
+
+            <div class="form-group col-md-4">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" asp-for="AreChecked.Name" />
+            </div>
+
+            <table>
+                @foreach (var item in Model.AreChecked.Jobs)
+                {
+                    <tr>
+                        <td>
+                            <input id="@item.Value" type="checkbox" name="Fruit" value="@item.Value" checked="@item.Selected" />
+                        </td>
+                        <td>
+                            <label for="@item.Value">@item.Text</label>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <button type="submit">Click</button>
+        </form>
+    </div>
+</div>
+<br />
+<br />
+
+<div class="container center">
+    <h2 class="text-center"> checkbox selected items</h2>
+    <p class="fs-4">@Model.AreChecked.Name</p>
+    <table>
+
+        @foreach (var fruit in Model.AreChecked.IsChecked)
+        {
+            <tr>
+                <td>
+                    <label class="form-label">@fruit</label>
+                </td>
+            </tr>
+        }
+    </table>
 </div>

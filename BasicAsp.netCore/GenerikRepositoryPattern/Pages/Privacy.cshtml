@@ -3,6 +3,20 @@
 @{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
-
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container center">
+        <h2 class="text-center"> checkbox selected items</h2>
+       @foreach(var items in Model.CheckedItems){
+         <p class="fs-4">@items.Name</p>
+        <table>
+            
+            @foreach (var fruit in @items.IsChecked)
+            {
+                <tr>
+                    <td>
+                        <label class="form-label">@fruit</label>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+</div>

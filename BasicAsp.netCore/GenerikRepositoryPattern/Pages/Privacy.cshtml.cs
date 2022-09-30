@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GenerikRepositoryPattern.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GenerikRepositoryPattern.Pages
@@ -11,9 +12,11 @@ namespace GenerikRepositoryPattern.Pages
         {
             _logger = logger;
         }
-
+        [BindProperty]
+        public List<MultipleCheckbox> CheckedItems { get; set; }
         public void OnGet()
         {
+            CheckedItems = CheckedItems.ToList();
         }
     }
 }
