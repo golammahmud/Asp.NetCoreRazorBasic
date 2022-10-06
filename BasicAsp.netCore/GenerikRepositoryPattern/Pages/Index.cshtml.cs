@@ -1,4 +1,5 @@
 ﻿using AppDataAccess.GenerikInterface;
+using AppDomain.DataModels;
 using GenerikRepositoryPattern.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,22 +10,20 @@ namespace GenerikRepositoryPattern.Pages
 {
     public class IndexModel : PageModel
     {
-        //private readonly ILogger<IndexModel> _logger;
-        //private IGenerik<MultipleCheckbox> _IMultipleCheckBox;
-        //public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckbox> IMultipleCheckBox)
-        //{
-        //    this._logger = logger;
-        //    this._IMultipleCheckBox = IMultipleCheckBox;
-        //}
+        private readonly ILogger<IndexModel> _logger;
+        private IGenerik<MultipleCheckbox> _IMultipleCheckBox;
+        public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckbox> IMultipleCheckBox)
+        {
+            this._logger = logger;
+            this._IMultipleCheckBox = IMultipleCheckBox;
+        }
 
         [BindProperty]
-        public MultipleCheckbox AreChecked { get; set; }
-
-        
-        public List<SelectListItem>? JobTypes { get; set; }
+        public MultipleCheckboxViewModel CheckedItems { get; set; }
+        public List<SelectListItem> JobTypes { get; set; }= new List<SelectListItem>();
         public void OnGet()
         {
-            AreChecked = new MultipleCheckbox();
+            CheckedItems = new MultipleCheckboxViewModel();
             JobTypes = new List<SelectListItem>()
                {
                     new SelectListItem() { Text="Mechanical", Value="Mechanical" },
@@ -35,36 +34,32 @@ namespace GenerikRepositoryPattern.Pages
            
             if (JobTypes!=null)
             {
-                AreChecked.Jobs = JobTypes;
+                CheckedItems.Jobs = JobTypes;
             }
-           
 
-
-            if (AreChecked.IsChecked == null)
-            {
-                AreChecked.IsChecked = new List<string>();
-            }
-            Page();
+            RedirectToPage("Index");
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
 
 
-            AreChecked = new MultipleCheckbox();
+            CheckedItems = new MultipleCheckboxViewModel();
             var data = Request.Form["Fruit"].ToList();
-            var isCheked = new List<string>();
-            foreach (var item in data)
+            
+            if (data.Count > 0)
             {
-                isCheked.Add(item);
+                if (data != null)
+                {
+                    CheckedItems.IsChecked = String.Join(",",data);
+                }
             }
 
-            AreChecked.IsChecked = isCheked;
-            //_IMultipleCheckBox.Insert(AreChecked);
-            //_IMultipleCheckBox.Save();
+
+         
             TempData["message"] = "data saved sucefully!";
 
-            return Page();
+            return RedirectToPage("Index");
         }
     }
 }

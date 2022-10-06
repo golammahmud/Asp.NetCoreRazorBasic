@@ -19,25 +19,29 @@
     </div>
     <div class="container">
         <form method="post">
-            <input type="hidden" asp-for="AreChecked.Id" />
+            <input type="hidden" asp-for="CheckedItems.Id" />
 
             <div class="form-group col-md-4">
                 <label class="form-label">Name</label>
-                <input type="text" class="form-control" asp-for="AreChecked.Name" />
+                <input type="text" class="form-control" asp-for="CheckedItems.Name" />
             </div>
 
             <table>
-                @foreach (var item in Model.AreChecked.Jobs)
+                @if (Model.CheckedItems.Jobs != null)
                 {
-                    <tr>
-                        <td>
-                            <input id="@item.Value" type="checkbox" name="Fruit" value="@item.Value" checked="@item.Selected" />
-                        </td>
-                        <td>
-                            <label for="@item.Value">@item.Text</label>
-                        </td>
-                    </tr>
+                    @foreach (var item in Model.CheckedItems.Jobs)
+                    {
+                        <tr>
+                            <td>
+                                <input id="@item.Value" type="checkbox" name="Fruit" value="@item.Value" checked="@item.Selected" />
+                            </td>
+                            <td>
+                                <label for="@item.Value">@item.Text</label>
+                            </td>
+                        </tr>
+                    }
                 }
+
             </table>
             <button type="submit">Click</button>
         </form>
@@ -46,18 +50,3 @@
 <br />
 <br />
 
-<div class="container center">
-    <h2 class="text-center"> checkbox selected items</h2>
-    <p class="fs-4">@Model.AreChecked.Name</p>
-    <table>
-
-        @foreach (var fruit in Model.AreChecked.IsChecked)
-        {
-            <tr>
-                <td>
-                    <label class="form-label">@fruit</label>
-                </td>
-            </tr>
-        }
-    </table>
-</div>
