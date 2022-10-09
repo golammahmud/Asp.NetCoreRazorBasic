@@ -23,6 +23,10 @@ namespace GenerikRepositoryPattern.Models
         public IFormFile? FormFile { get; set; }
 
 
+        public int? FileId { get; set; }
+        public List<IFormFile>? FormFiles { get; set; }
+
+
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? CreatedAt { get; set; }

@@ -24,6 +24,7 @@
             <div class="form-group col-md-4">
                 <label class="form-label">Name</label>
                 <input type="text" class="form-control" asp-for="AreChecked.Name" />
+                <span asp-validation-for="AreChecked.Name" class="text-danger"></span>
             </div>
 
             <table>
@@ -61,3 +62,7 @@
         }
     </table>
 </div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial"  />
+}

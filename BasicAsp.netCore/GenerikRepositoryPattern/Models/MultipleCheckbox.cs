@@ -13,7 +13,10 @@ namespace GenerikRepositoryPattern.Models
 
         [Key]
         public int Id { get; set; }
-        public string? Name { get; set; }
+
+        [Display(Name="Name")]
+        [Required(ErrorMessage ="Name field is required !")]
+        public string Name { get; set; }
 
         public List<string> IsChecked { get; set; }
         public List<SelectListItem> Jobs { get; set; }

@@ -17,12 +17,14 @@ namespace AppDomain.DataModels
 
         public decimal? Price { get; set; }
         public int? CategoryId { get; set; }
-        public virtual Category? Category { get; set; }
+        public virtual Category? CategoriList { get; set; }
         public string? Description { get; set; }
-
-
         public Byte[]? File { get; set; }
         public string? FileUrl { get; set; }
+
+        //Navigation path
+       public int? FileId { get; set; }
+        public List<FileModel>? Files { get; set; }
         public DateTime CreatedAt { get; set; }
 
     }

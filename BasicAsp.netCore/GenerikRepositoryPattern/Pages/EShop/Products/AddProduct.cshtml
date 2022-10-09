@@ -1,0 +1,76 @@
+﻿
+@page "{id:min(1)?}/{handler?}"
+@using AppDataAccess.GenerikInterface
+@using AppDomain.DataModels
+@model GenerikRepositoryPattern.Pages.EShop.Products.AddProductModel
+
+@{
+    ViewData["title"] = " Add New product";
+    var pageHeader = Model.product.Id > 0 ? "Edit" : "Create";
+    var pageButton = Model.product.Id > 0 ? "Update" : "Create";
+}
+
+<div class="container">
+    <h1>@pageHeader</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input class="form-control" type="hidden" asp-for="product.Id" />
+        <div class="form-group ">
+            <label class="form-label" asp-for="product.Name"></label>
+            <input class="form-control" type="text" asp-for="product.Name" />
+            <span asp-validation-for="product.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group ">
+            <label class="form-label" asp-for="product.Price"></label>
+            <input class="form-control" type="number" asp-for="product.Price" />
+            <span asp-validation-for="product.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group ">
+            <label class="form-label" asp-for="product.Description"></label>
+            <input class="form-control" type="text" asp-for="product.Description" />
+            <span asp-validation-for="product.Description" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-4">
+                <label class="form-label" asp-for="product.CategoryId"></label>
+                <select class="form-select  mb-3" asp-for="product.CategoryId" asp-items="@Model.Options" aria-label=".form-select-lg example">
+                    <option value="">--Select Category--</option>
+                </select>
+                <span asp-validation-for="product.CreatedAt" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="product.FormFiles" class="form-label"></label>
+                    <input asp-for="product.FormFiles" class="form-control" type="file" multiple />
+                    <span class="text-danger" asp-validation-for="product.FormFiles"></span>
+                </div>
+            </div>
+            @if (@Model.product.File != null || @Model.product.FileUrl != null)
+            {
+                <div class="col-md-6">
+
+                    @{
+                        var base64 = Convert.ToBase64String(@Model.product.File);
+                        var FileSrc = string.Format("data:image/gif;base64,{0}", base64);
+                    }
+                     <label class="form-label text-wrap text-truncate">@Model.product.FileUrl</label>                  
+                    <img src="@FileSrc" class="rounded" width="120" height="120" alt="@Html.DisplayFor(x=>x.product.FileUrl)" />
+
+                </div>
+            }
+        </div>
+
+
+
+        <div class="form-group ">
+            <input class="form-control" type="hidden" value="@System.DateTime.UtcNow" asp-for="product.CreatedAt" />
+            <span asp-validation-for="product.CreatedAt" class="text-danger"></span>
+        </div>
+        <div class="form-control">
+            <button type="submit" class="btn-outline-info btn-lg">@pageButton</button>
+        </div>
+
+      @*  onclick="return confirm('Are you sure you want to delete?')" *@
+    </form>
+</div>

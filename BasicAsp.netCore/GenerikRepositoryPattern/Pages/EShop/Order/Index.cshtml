@@ -1,0 +1,49 @@
+﻿@page
+@model GenerikRepositoryPattern.Pages.EShop.Order.IndexModel
+@{
+}
+@*<div class="container">
+    <div class="form-group">
+        <label class="form-label" asp-for="Orders.IsOrdered"></label>
+        <select class="form-select" asp-for="Orders.IsOrdered">
+            <option selected></option>
+            <option value="true">yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label class="form-label" asp-for="Orders.IsNewOreder"></label>
+        <select class="form-select" asp-for="Orders.IsNewOreder">
+            <option selected></option>
+            <option value="true">yes</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+</div>*@
+
+<div class="container">
+    <form method="post">
+        @foreach (var item in Model.AreChecked.jobItem)
+        {
+            <input type="checkbox" id="vehicle1" asp-for="AreChecked.jobName" name="@item" value="@item">
+            <label for="vehicle1" asp-for="@item"> </label>            
+        }
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("#submit").click(function(e) {
+            e.preventDefault();
+            let dropdown= $('#cars :selected').text();
+            // let checkbox = $("input[name='vehicle']:checked").val();
+            let checkbox = $('.checkbox:checked').map(function(){
+                return this.value;
+            }).get();
+            console.log(checkbox)
+
+        })
+        
+    })
+</script>
