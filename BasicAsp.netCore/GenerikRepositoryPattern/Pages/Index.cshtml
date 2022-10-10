@@ -19,16 +19,21 @@
     </div>
     <div class="container">
         <form method="post">
-            <input type="hidden" asp-for="AreChecked.Id" />
+            <input type="hidden" asp-for="ModelItem.Id" />
 
             <div class="form-group col-md-4">
                 <label class="form-label">Name</label>
-                <input type="text" class="form-control" asp-for="AreChecked.Name" />
-                <span asp-validation-for="AreChecked.Name" class="text-danger"></span>
+                <input type="text" class="form-control" asp-for="ModelItem.Name" />
+                <span asp-validation-for="ModelItem.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label class="form-label">Category</label>
+                <input type="text" class="form-control" asp-for="ModelItem.Category" />
+                <span asp-validation-for="ModelItem.Category" class="text-danger"></span>
             </div>
 
             <table>
-                @foreach (var item in Model.AreChecked.Jobs)
+                @foreach (var item in Model.JobList)
                 {
                     <tr>
                         <td>
@@ -47,12 +52,12 @@
 <br />
 <br />
 
-<div class="container center">
+@*<div class="container center">
     <h2 class="text-center"> checkbox selected items</h2>
-    <p class="fs-4">@Model.AreChecked.Name</p>
+    <p class="fs-4">@Model.ModelItem.Name</p>
     <table>
 
-        @foreach (var fruit in Model.AreChecked.IsChecked)
+        @foreach (var fruit in Model.ModelItem.IsChecked)
         {
             <tr>
                 <td>
@@ -61,8 +66,8 @@
             </tr>
         }
     </table>
-</div>
+</div>*@
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial"  />
+    <partial name="_ValidationScriptsPartial" />
 }

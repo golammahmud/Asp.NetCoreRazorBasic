@@ -18,52 +18,48 @@ namespace GenerikRepositoryPattern.Pages
         //}
 
         [BindProperty]
-        public MultipleCheckbox AreChecked { get; set; }
+        public MultipleCheckbox ModelItem { get; set; } = default!;
 
-        
-        public List<SelectListItem>? JobTypes { get; set; }
+        [BindProperty]
+        public IList<SelectListItem> JobList { get; set; } = default!;
         public void OnGet()
         {
-            AreChecked = new MultipleCheckbox();
-            JobTypes = new List<SelectListItem>()
+            ModelItem = new MultipleCheckbox();
+            JobList = new List<SelectListItem>();
+            JobList = new List<SelectListItem>()
                {
                     new SelectListItem() { Text="Mechanical", Value="Mechanical" },
                     new SelectListItem() { Text="Electrical", Value="Electrical" },
                     new SelectListItem() { Text="Fluid Power", Value="Fluid Power" },
                     new SelectListItem() { Text="Programming", Value="Programming" }
                };
-           
-            if (JobTypes!=null)
-            {
-                AreChecked.Jobs = JobTypes;
-            }
-           
 
-
-            if (AreChecked.IsChecked == null)
-            {
-                AreChecked.IsChecked = new List<string>();
+            //if (JobList.Count > 0 && JobList!=null)
+            //{
+            //    ModelItem.jobTypeList = JobList;
+            //}
+          
+            if(ModelItem.IsChecked ==null){
+                ModelItem = new MultipleCheckbox();
             }
             Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-
-
-            AreChecked = new MultipleCheckbox();
-            var data = Request.Form["Fruit"].ToList();
-            var isCheked = new List<string>();
-            foreach (var item in data)
+            if (ModelState.IsValid)
             {
-                isCheked.Add(item);
+                ModelItem = new MultipleCheckbox();
+                var data = Request.Form["Fruit"].ToList();
+
+                if (data != null)
+                {
+                    ModelItem.IsChecked = String.Join("@@", data);
+                }
+                //_IMultipleCheckBox.Insert(ModelItem);
+                //_IMultipleCheckBox.Save();
+                TempData["message"] = "data saved sucefully!";
             }
-
-            AreChecked.IsChecked = isCheked;
-            //_IMultipleCheckBox.Insert(AreChecked);
-            //_IMultipleCheckBox.Save();
-            TempData["message"] = "data saved sucefully!";
-
             return Page();
         }
     }
