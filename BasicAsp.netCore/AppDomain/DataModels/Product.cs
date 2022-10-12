@@ -22,10 +22,11 @@ namespace AppDomain.DataModels
         public Byte[]? File { get; set; }
         public string? FileUrl { get; set; }
 
+
         //Navigation path
-       public int? FileId { get; set; }
+      
         public List<FileModel>? Files { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

@@ -9,22 +9,22 @@ namespace GenerikRepositoryPattern.Pages
 {
     public class IndexModel : PageModel
     {
-        //private readonly ILogger<IndexModel> _logger;
-        //private IGenerik<MultipleCheckbox> _IMultipleCheckBox;
-        //public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckbox> IMultipleCheckBox)
-        //{
-        //    this._logger = logger;
-        //    this._IMultipleCheckBox = IMultipleCheckBox;
-        //}
+        private readonly ILogger<IndexModel> _logger;
+        private IGenerik<MultipleCheckboxViewModel> _IMultipleCheckBox;
+        public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckboxViewModel> IMultipleCheckBox)
+        {
+            this._logger = logger;
+            this._IMultipleCheckBox = IMultipleCheckBox;
+        }
 
         [BindProperty]
-        public MultipleCheckbox ModelItem { get; set; } = default!;
+        public MultipleCheckboxViewModel ModelItem { get; set; } = default!;
 
         [BindProperty]
         public IList<SelectListItem> JobList { get; set; } = default!;
         public void OnGet()
         {
-            ModelItem = new MultipleCheckbox();
+            ModelItem = new MultipleCheckboxViewModel();
             JobList = new List<SelectListItem>();
             JobList = new List<SelectListItem>()
                {
@@ -40,7 +40,7 @@ namespace GenerikRepositoryPattern.Pages
             //}
           
             if(ModelItem.IsChecked ==null){
-                ModelItem = new MultipleCheckbox();
+                ModelItem = new MultipleCheckboxViewModel();
             }
             Page();
         }
@@ -49,16 +49,17 @@ namespace GenerikRepositoryPattern.Pages
         {
             if (ModelState.IsValid)
             {
-                ModelItem = new MultipleCheckbox();
+                ModelItem = new MultipleCheckboxViewModel();
                 var data = Request.Form["Fruit"].ToList();
 
                 if (data != null)
                 {
                     ModelItem.IsChecked = String.Join("@@", data);
                 }
-                //_IMultipleCheckBox.Insert(ModelItem);
-                //_IMultipleCheckBox.Save();
+                _IMultipleCheckBox.Insert(ModelItem);
+                _IMultipleCheckBox.Save();
                 TempData["message"] = "data saved sucefully!";
+                return RedirectToPage("Index");
             }
             return Page();
         }
