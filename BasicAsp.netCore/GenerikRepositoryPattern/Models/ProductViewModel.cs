@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AppDomain.DataModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace GenerikRepositoryPattern.Models
 {
@@ -26,7 +27,7 @@ namespace GenerikRepositoryPattern.Models
         public int? FileId { get; set; }
         public List<IFormFile>? FormFiles { get; set; }
 
-
+        public IList<FileModel> ?Files { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? CreatedAt { get; set; }

@@ -74,6 +74,28 @@ namespace AppDataAccess.Migrations
                     b.ToTable("FileModel");
                 });
 
+            modelBuilder.Entity("AppDomain.DataModels.MultipleCheckbox", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsChecked")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MultipleCheckbox");
+                });
+
             modelBuilder.Entity("AppDomain.DataModels.Product", b =>
                 {
                     b.Property<int>("Id")

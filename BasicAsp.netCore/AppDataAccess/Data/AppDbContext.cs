@@ -18,6 +18,8 @@ namespace AppDataAccess.Data
 
         public virtual DbSet<FileModel> FileModel { get; set; }
 
+        public virtual DbSet<MultipleCheckbox> MultipleCheckbox { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

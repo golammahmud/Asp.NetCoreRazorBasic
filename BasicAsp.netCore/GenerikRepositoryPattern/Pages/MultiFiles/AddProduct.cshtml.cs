@@ -1,3 +1,4 @@
+using AppDataAccess.Data;
 using AppDataAccess.GenerikInterface;
 using AppDomain.DataModels;
 using GenerikRepositoryPattern.Models;
@@ -11,16 +12,17 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
 {
     public class AddProductModel : PageModel
     {
-
+        private readonly AppDbContext _appDbContext;
         private readonly IWebHostEnvironment webHostEnvironment;
         private IGenerik<Product> _IProducts;
         private IGenerik<Category> _Category;
 
-        public AddProductModel(IGenerik<Product> iProducts, IGenerik<Category> category, IWebHostEnvironment _webHostEnvironment)
+        public AddProductModel(AppDbContext appDbContext, IGenerik<Product> iProducts, IGenerik<Category> category, IWebHostEnvironment _webHostEnvironment)
         {
             this._IProducts = iProducts;
             this._Category = category;
             this.webHostEnvironment = _webHostEnvironment;
+            this._appDbContext = appDbContext;
         }
         public IList<FileModel> FileNames { get; set; }
         [BindProperty]
@@ -37,8 +39,11 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
             product = new ProductViewModel();
             if (id.HasValue)
             {
+
                 Product domainProduct = _IProducts.GetById(id.Value);
-                if (domainProduct != null)
+
+                var FileModelItemList = _appDbContext.FileModel.Where(f => f.ProductId == id.Value).ToList();
+                if (domainProduct != null || FileModelItemList != null)
                 {
                     product.Id = id.Value;
                     product.Name = domainProduct.Name;
@@ -47,6 +52,7 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                     product.Description = domainProduct.Description;
                     product.File = domainProduct.File;
                     product.FileUrl = domainProduct.FileUrl;
+                    product.Files = (IList<FileModel>?)FileModelItemList;
                     product.CreatedAt = domainProduct.CreatedAt;
 
                 }
@@ -83,7 +89,8 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         return Page();
                     }
 
-                     UpdateProduct = _IProducts.GetById(product.Id);
+                    UpdateProduct = _IProducts.GetById(product.Id);
+                    var FileModelItemList = _appDbContext.FileModel.Where(f => f.ProductId == UpdateProduct.Id).ToList();
                     {
                         UpdateProduct.Id = product.Id;
                         UpdateProduct.Name = product.Name;
@@ -93,16 +100,22 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         UpdateProduct.CreatedAt = (DateTime?)product.CreatedAt;
                     }
                     //uploads file to folder
-                    if (product.FormFiles != null || product.File == null)
+                    if (product.FormFiles != null)
                     {
 
                         if (IsFileValid(product.FormFiles))
                         {
                             string updateFolder = "MultipleFileUploads/Products";
-                            if (UpdateProduct.FileUrl != null)
+                            if (UpdateProduct.Files != null)
                             {
-                                string uploadedFile = Path.Combine(webHostEnvironment.WebRootPath, "MultipleFileUploads/Products", UpdateProduct.FileUrl);
-                                System.IO.File.Delete(uploadedFile);
+                                foreach (var items in UpdateProduct.Files)
+                                {
+                                    if (items.FilePath != null)
+                                    {
+                                        string uploadedFile = Path.Combine(webHostEnvironment.WebRootPath, "MultipleFileUploads/Products", items.FilePath);
+                                        System.IO.File.Delete(uploadedFile);
+                                    }
+                                }
                             }
                             UpdateProduct.Files = new List<FileModel>();
                             foreach (var item in product.FormFiles)
@@ -113,33 +126,22 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                                 };
                                 UpdateProduct.Files.Add(files);
                             }
+                            
                             foreach (var file in product.FormFiles)
                             {
-                                using (var memoryStream = new MemoryStream())
+                                var fileBytesStream = GetFileBytes(file);
+                                if (fileBytesStream.Length < 2097152)
                                 {
-                                    await file.CopyToAsync(memoryStream);
-                                    if (memoryStream.Length < 2097152)
+                                    var files = new FileModel()
                                     {
-                                        var files = new FileModel()
-                                        {
-                                            File = memoryStream.ToArray()
-                                        };
-                                        UpdateProduct.Files.Add(files);
-                                    }
-                                    else
-                                    {
-                                        ModelState.AddModelError("File", "The file is too large");
-
-                                    }
+                                        File = fileBytesStream
+                                    };
+                                    UpdateProduct.Files.Add(files);
                                 }
                             }
-
                         }
                     }
-                    if (FileNames != null && FileNames.Count > 0)
-                    {
-                        UpdateProduct.Files = FileNames.ToList();
-                    }
+
                     _IProducts.Update(UpdateProduct);
                     _IProducts.Save();
                     return RedirectToPage("ProductList");
@@ -155,13 +157,14 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                         newProduct.Price = product.Price;
                         newProduct.CategoryId = product.CategoryId;
                         newProduct.Description = product.Description;
-                        newProduct.CreatedAt = (DateTime)product.CreatedAt;
+                        newProduct.CreatedAt = (DateTime?)product.CreatedAt;
                     }
-                    //uploads file to folder
+
                     if (product.FormFiles != null && product.FormFiles.Count > 0)
                     {
                         if (IsFileValid(product.FormFiles))
                         {
+                            //uploads file to folder
                             string folder = "MultipleFileUploads/Products";
                             newProduct.Files = new List<FileModel>();
                             foreach (var item in product.FormFiles)
@@ -174,22 +177,16 @@ namespace GenerikRepositoryPattern.Pages.EShop.Products
                             }
                             foreach (var file in product.FormFiles)
                             {
-                                using (var memoryStream = new MemoryStream())
+                                var ByteFile = GetFileBytes(file);
+                                if (ByteFile.Length < 2097152)
                                 {
-                                    await file.CopyToAsync(memoryStream);
-                                    if (memoryStream.Length < 2097152)
+                                    var byteArray = new FileModel()
                                     {
-                                        var Bytefiles = new FileModel()
-                                        {
-                                            File = memoryStream.ToArray()
-                                        };
-                                        newProduct.Files.Add(Bytefiles);
-                                    }
-                                    else
-                                    {
-                                        ModelState.AddModelError("File", "The file is too large");
-                                    }
+                                        File = ByteFile,
+                                    };
+                                    newProduct.Files.Add(byteArray);
                                 }
+
                             }
                         }
                         else

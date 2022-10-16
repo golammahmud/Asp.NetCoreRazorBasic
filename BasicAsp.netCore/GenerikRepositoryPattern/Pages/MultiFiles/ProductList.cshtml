@@ -72,9 +72,13 @@
                             }
                         </td>*@
                         <td>
-                            <a id="editStudentModal" data-toggle="modal" asp-page="AddProduct" asp-route-id="@item.Id" data-target="#modal-action-student"
+                            <a id="editProductModal" data-toggle="modal" asp-page="AddProduct" asp-route-id="@item.Id" data-target="#modal-action-student"
                            class="btn btn-info">
                                 <i class="glyphicon glyphicon-pencil"></i>  Edit
+                            </a>
+                            <a id="editStudentModal" data-toggle="modal" asp-page="ProductDetail" asp-route-id="@item.Id" data-target="#modal-action-student"
+                           class="btn btn-info">
+                                <i class="glyphicon glyphicon-pencil"></i>  View
                             </a>
                         </td>
                     </tr>

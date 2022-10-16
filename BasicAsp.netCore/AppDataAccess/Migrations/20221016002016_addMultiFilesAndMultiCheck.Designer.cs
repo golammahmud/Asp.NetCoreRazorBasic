@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppDataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220919102929_init")]
-    partial class init
+    [Migration("20221016002016_addMultiFilesAndMultiCheck")]
+    partial class addMultiFilesAndMultiCheck
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,6 +49,55 @@ namespace AppDataAccess.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("AppDomain.DataModels.FileModel", b =>
+                {
+                    b.Property<int>("FileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FileId"), 1L, 1);
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("File")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FileId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("FileModel");
+                });
+
+            modelBuilder.Entity("AppDomain.DataModels.MultipleCheckbox", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsChecked")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MultipleCheckbox");
+                });
+
             modelBuilder.Entity("AppDomain.DataModels.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -60,7 +109,7 @@ namespace AppDataAccess.Migrations
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -85,18 +134,30 @@ namespace AppDataAccess.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("AppDomain.DataModels.FileModel", b =>
+                {
+                    b.HasOne("AppDomain.DataModels.Product", null)
+                        .WithMany("Files")
+                        .HasForeignKey("ProductId");
+                });
+
             modelBuilder.Entity("AppDomain.DataModels.Product", b =>
                 {
-                    b.HasOne("AppDomain.DataModels.Category", "Category")
+                    b.HasOne("AppDomain.DataModels.Category", "CategoriList")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
-                    b.Navigation("Category");
+                    b.Navigation("CategoriList");
                 });
 
             modelBuilder.Entity("AppDomain.DataModels.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("AppDomain.DataModels.Product", b =>
+                {
+                    b.Navigation("Files");
                 });
 #pragma warning restore 612, 618
         }

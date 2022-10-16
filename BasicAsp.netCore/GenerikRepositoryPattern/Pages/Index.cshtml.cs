@@ -1,4 +1,5 @@
 ﻿using AppDataAccess.GenerikInterface;
+using AppDomain.DataModels;
 using GenerikRepositoryPattern.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,8 +11,8 @@ namespace GenerikRepositoryPattern.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private IGenerik<MultipleCheckboxViewModel> _IMultipleCheckBox;
-        public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckboxViewModel> IMultipleCheckBox)
+        private IGenerik<MultipleCheckbox> _IMultipleCheckBox;
+        public IndexModel(ILogger<IndexModel> logger, IGenerik<MultipleCheckbox> IMultipleCheckBox)
         {
             this._logger = logger;
             this._IMultipleCheckBox = IMultipleCheckBox;
@@ -56,7 +57,16 @@ namespace GenerikRepositoryPattern.Pages
                 {
                     ModelItem.IsChecked = String.Join("@@", data);
                 }
-                _IMultipleCheckBox.Insert(ModelItem);
+                MultipleCheckbox InsertData = new MultipleCheckbox();
+                {
+                    InsertData.Id = ModelItem.Id;
+                    InsertData.Name=ModelItem.Name;
+                    InsertData.IsChecked=ModelItem.IsChecked;
+                    InsertData.Category=ModelItem.Category;
+                    
+                   
+                }
+                _IMultipleCheckBox.Insert(InsertData);
                 _IMultipleCheckBox.Save();
                 TempData["message"] = "data saved sucefully!";
                 return RedirectToPage("Index");

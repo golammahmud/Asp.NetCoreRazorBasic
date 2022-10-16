@@ -1,0 +1,38 @@
+﻿@page "{Id:int}"
+@model GenerikRepositoryPattern.Pages.MultiFiles.ProductDetailModel
+@{
+    ViewData["Title"] = "Product detail ";
+}
+
+
+
+
+
+<table class="table table-bordered  table-responsive">
+    <thead>
+        <tr></tr>
+
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.productView.Name</td>
+            <td>@Model.productView.Price</td>
+            <td>@Model.productView.CategoryId</td>
+            <td>@Model.productView.Description</td>
+            <td>
+        <tr>
+                    @if (@Model.productView.Files != null)
+                    {
+                        @foreach (var item in @Model.productView.Files)
+                        {
+                    <td>ByteFile:@item.File</td>
+                    <td>@item.FilePath</td>
+                        }
+
+                    }
+
+        </tr>
+        </td>
+        </tr>
+    </tbody>
+    </tableclas>

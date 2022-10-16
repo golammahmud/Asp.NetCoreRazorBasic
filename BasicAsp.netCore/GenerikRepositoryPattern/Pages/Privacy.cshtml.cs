@@ -13,7 +13,7 @@ namespace GenerikRepositoryPattern.Pages
             _logger = logger;
         }
         [BindProperty]
-        public List<MultipleCheckbox> CheckedItems { get; set; }
+        public List<MultipleCheckboxViewModel> CheckedItems { get; set; }
         public void OnGet()
         {
             CheckedItems = CheckedItems.ToList();
