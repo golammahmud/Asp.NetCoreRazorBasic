@@ -17,7 +17,6 @@ namespace AppDomain.DataModels
 
         public string? Name { get; set; }
 
-        public int SubCheckboxId { get; set; }
        public IList<SubCheckBox>? CheckBoxes { get; set; }
 
        

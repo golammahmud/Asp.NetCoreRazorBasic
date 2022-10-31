@@ -1,0 +1,42 @@
+﻿@page "{Id:int}"
+@model GenerikRepositoryPattern.Pages.Checkbox.editModel
+@{
+}
+
+<div class="container">
+    <div class="text-center">
+        <h1 class="display-4">Multiple check box</h1>
+    </div>
+    <div class="container">
+        <form method="post">
+            <input type="hidden" asp-for="ModelItem.Id" />
+
+            <div>
+                <input asp-for="ModelItem.Id" type="hidden" class="form-control" />
+                <div class="form-group">
+                    <label asp-for="ModelItem.Name" class="control-label">Name</label>
+                    <input name="name" class="form-control" />
+
+                </div>
+                <table>
+                    @{
+                        IList<SelectListItem> OrgListing = Model.CheckBoxItemList;
+                    }
+
+                    @foreach (var Org in OrgListing)
+                    {
+                        <tr>
+                            <td>
+                                <input id="@Org.Value" type="checkbox" name="Fruit" value="@Org.Value" checked="@Org.Value||@Org.Selected" />
+                            </td>
+                            <td>
+                                <label for="@Org.Value">@Org.Text</label>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <button type="submit">Click</button>
+        </form>
+    </div>
+</div>
